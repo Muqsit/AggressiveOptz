@@ -107,6 +107,7 @@ class FallingBlockOptimizationComponent implements OptimizationComponent{
 								assert($iterator->currentSubChunk !== null);
 								if(isset($not_replaceable[$iterator->currentSubChunk->getFullBlock($xc, $y & 0x0f, $zc)])){
 									$entity->teleport(new Vector3($real_pos->x, $y + 1 + ($entity->height / 2), $real_pos->z));
+									$entity->setMotion($motion);
 									break;
 								}
 								--$y;
@@ -127,6 +128,7 @@ class FallingBlockOptimizationComponent implements OptimizationComponent{
 							}
 							if($begin - $y >= $this->falling_block_max_height){
 								$entity->teleport(new Vector3($real_pos->x, $y + 1 + ($entity->height / 2), $real_pos->z));
+								$entity->setMotion($motion);
 							}
 						}
 					}
@@ -170,7 +172,7 @@ class FallingBlockOptimizationComponent implements OptimizationComponent{
 					/** @var int $y */
 					$y = $pos->y;
 					/** @var int $z */
-					$z = $pos->x;
+					$z = $pos->z;
 					$chunk = $world_cache_manager->get($pos->getWorld())->getChunk($chunkX = $x >> 4, $chunkZ = $z >> 4);
 					if($chunk !== null && $chunk->get(self::CACHE_KEY_FALLING_BLOCKS, 0) >= $this->falling_block_queue_size){
 						$event->cancel();
