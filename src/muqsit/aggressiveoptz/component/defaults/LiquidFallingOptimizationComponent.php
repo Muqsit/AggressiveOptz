@@ -59,7 +59,7 @@ class LiquidFallingOptimizationComponent implements OptimizationComponent{
 				/** @var int $z */
 				$z = $pos->z;
 
-				$chunk = $world->getOrLoadChunk($x >> 4, $z >> 4);
+				$chunk = $world->getChunk($x >> 4, $z >> 4);
 				if($chunk !== null){
 					$xc = $x & 0x0f;
 					$zc = $z & 0x0f;

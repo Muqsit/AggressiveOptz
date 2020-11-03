@@ -17,6 +17,7 @@ use pocketmine\event\entity\EntityDespawnEvent;
 use pocketmine\event\entity\EntitySpawnEvent;
 use pocketmine\math\Vector3;
 use pocketmine\world\utils\SubChunkExplorer;
+use pocketmine\world\utils\SubChunkExplorerStatus;
 use pocketmine\world\World;
 
 class FallingBlockOptimizationComponent implements OptimizationComponent{
@@ -100,7 +101,7 @@ class FallingBlockOptimizationComponent implements OptimizationComponent{
 
 						if($count >= $this->falling_block_queue_size){
 							while($y > 0){
-								if(!$iterator->moveTo($x, $y, $z, false)){
+								if($iterator->moveTo($x, $y, $z) === SubChunkExplorerStatus::INVALID){
 									break;
 								}
 
@@ -115,7 +116,7 @@ class FallingBlockOptimizationComponent implements OptimizationComponent{
 						}elseif($this->falling_block_max_height !== -1){
 							$begin = $y;
 							while($y > 0){
-								if(!$iterator->moveTo($x, $y, $z, false)){
+								if($iterator->moveTo($x, $y, $z) === SubChunkExplorerStatus::INVALID){
 									break;
 								}
 
