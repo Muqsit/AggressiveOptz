@@ -39,7 +39,7 @@ class FallingBlockOptimizationComponent implements OptimizationComponent{
 	private $unregisters = [];
 
 	/** @var int[] */
-	private $entity_chunks = [];
+	private $entity_spawn_chunks = [];
 
 	public function __construct(int $falling_block_queue_size, int $falling_block_max_height){
 		if($falling_block_queue_size < 0){
@@ -68,7 +68,7 @@ class FallingBlockOptimizationComponent implements OptimizationComponent{
 
 					$chunk = $world_cache_manager->get($world)->getChunk($chunkX = $real_pos->getFloorX() >> 4, $chunkZ = $real_pos->getFloorZ() >> 4);
 					if($chunk !== null){
-						$this->entity_chunks[$entity->getId()] = World::chunkHash($chunkX, $chunkZ);
+						$this->entity_spawn_chunks[$entity->getId()] = World::chunkHash($chunkX, $chunkZ);
 						$chunk->set(self::CACHE_KEY_FALLING_BLOCKS, $count = $chunk->get(self::CACHE_KEY_FALLING_BLOCKS, 0) + 1);
 					}else{
 						$count = 1;
@@ -138,9 +138,9 @@ class FallingBlockOptimizationComponent implements OptimizationComponent{
 
 			$api->registerEvent(function(EntityDespawnEvent $event) use($world_cache_manager) : void{
 				$entity = $event->getEntity();
-				if(isset($this->entity_chunks[$id = $entity->getId()])){
-					World::getXZ($this->entity_chunks[$id], $chunkX, $chunkZ);
-					unset($this->entity_chunks[$id]);
+				if(isset($this->entity_spawn_chunks[$id = $entity->getId()])){
+					World::getXZ($this->entity_spawn_chunks[$id], $chunkX, $chunkZ);
+					unset($this->entity_spawn_chunks[$id]);
 					$chunk = $world_cache_manager->get($world = $entity->getWorld())->getChunk($chunkX, $chunkZ);
 					if($chunk !== null){
 						$chunk->set(self::CACHE_KEY_FALLING_BLOCKS, $chunk->get(self::CACHE_KEY_FALLING_BLOCKS, 0) - 1);
@@ -175,10 +175,14 @@ class FallingBlockOptimizationComponent implements OptimizationComponent{
 					/** @var int $z */
 					$z = $pos->z;
 					$chunk = $world_cache_manager->get($pos->getWorld())->getChunk($chunkX = $x >> 4, $chunkZ = $z >> 4);
-					if($chunk !== null && $chunk->get(self::CACHE_KEY_FALLING_BLOCKS, 0) >= $this->falling_block_queue_size){
-						$event->cancel();
+					if($chunk !== null){
 						$queue = $chunk->get(self::CACHE_KEY_FALLING_BLOCKS_QUEUE, []);
-						$queue[World::blockHash($x, $y, $z)] = null;
+						if($chunk->get(self::CACHE_KEY_FALLING_BLOCKS, 0) >= $this->falling_block_queue_size){
+							$event->cancel();
+							$queue[World::blockHash($x, $y, $z)] = null;
+						}else{
+							unset($queue[World::blockHash($x, $y, $z)]);
+						}
 						$chunk->set(self::CACHE_KEY_FALLING_BLOCKS_QUEUE, $queue);
 					}
 				}
