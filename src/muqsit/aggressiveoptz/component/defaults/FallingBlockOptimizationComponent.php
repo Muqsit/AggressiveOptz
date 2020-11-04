@@ -62,7 +62,7 @@ class FallingBlockOptimizationComponent implements OptimizationComponent{
 		$this->unregisters = [
 			$api->registerEvent(function(EntitySpawnEvent $event) use($world_cache_manager) : void{
 				$entity = $event->getEntity();
-				if($entity instanceof FallingBlock && !$entity->isFlaggedForDespawn()){
+				if($entity instanceof FallingBlock && !$entity->isClosed() && !$entity->isFlaggedForDespawn()){
 					$real_pos = $entity->getPosition();
 					$world = $real_pos->getWorld();
 
