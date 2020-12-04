@@ -28,12 +28,10 @@ final class AggressiveOptzWorldCacheManager{
 			$this->onWorldUnload($event->getWorld());
 		}, EventPriority::MONITOR);
 		$api->registerEvent(function(ChunkLoadEvent $event) : void{
-			$chunk = $event->getChunk();
-			$this->onChunkLoad($event->getWorld(), $chunk->getX(), $chunk->getZ());
+			$this->onChunkLoad($event->getWorld(), $event->getChunkX(), $event->getChunkZ());
 		}, EventPriority::LOWEST);
 		$api->registerEvent(function(ChunkUnloadEvent $event) : void{
-			$chunk = $event->getChunk();
-			$this->onChunkUnload($event->getWorld(), $chunk->getX(), $chunk->getZ());
+			$this->onChunkUnload($event->getWorld(), $event->getChunkX(), $event->getChunkZ());
 		}, EventPriority::MONITOR);
 
 		foreach($api->getServer()->getWorldManager()->getWorlds() as $world){

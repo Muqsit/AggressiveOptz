@@ -15,8 +15,9 @@ final class AggressiveOptzWorldCache{
 	private $cache = [];
 
 	public function __construct(World $world){
-		foreach($world->getChunks() as $chunk){
-			$this->onChunkLoad($chunk->getX(), $chunk->getZ());
+		foreach($world->getChunks() as $chunk_hash => $_){
+			World::getXZ($chunk_hash, $chunkX, $chunkZ);
+			$this->onChunkLoad($chunkX, $chunkZ);
 		}
 	}
 
