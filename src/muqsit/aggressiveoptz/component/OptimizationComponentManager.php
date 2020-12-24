@@ -25,6 +25,10 @@ final class OptimizationComponentManager{
 		$this->logger = new PrefixedLogger($api->getLogger(), "OC-Manager");
 	}
 
+	public function getLogger() : Logger{
+		return $this->logger;
+	}
+
 	public function isEnabled(string $identifier) : bool{
 		return isset($this->enabled[$identifier]);
 	}

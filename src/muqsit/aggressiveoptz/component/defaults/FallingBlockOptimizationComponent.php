@@ -50,6 +50,9 @@ class FallingBlockOptimizationComponent implements OptimizationComponent{
 		if($falling_block_max_height < 0){
 			throw new InvalidArgumentException("Falling block queue size cannot be negative");
 		}
+		if($falling_block_queue_size > $falling_block_max_height){
+			throw new InvalidArgumentException("Falling block queue size cannot be greater than falling block max height");
+		}
 		$this->falling_block_max_height = $falling_block_max_height >= World::Y_MAX ? -1 : $falling_block_max_height;
 	}
 
