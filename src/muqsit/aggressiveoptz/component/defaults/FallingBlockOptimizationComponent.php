@@ -80,7 +80,7 @@ class FallingBlockOptimizationComponent implements OptimizationComponent{
 					$motion = $entity->getMotion();
 					if($motion->x == 0.0 && $motion->z == 0.0){ // moved by gravitation only
 						$iterator = new SubChunkExplorer($world);
-						$pos = $real_pos->add(-$entity->width / 2, $entity->height, -$entity->width / 2)->floor();
+						$pos = $real_pos->add(-$entity->size->getWidth() / 2, $entity->size->getHeight(), -$entity->size->getWidth() / 2)->floor();
 
 						/** @var int $x */
 						$x = $pos->x;
@@ -110,7 +110,7 @@ class FallingBlockOptimizationComponent implements OptimizationComponent{
 
 								assert($iterator->currentSubChunk !== null);
 								if(isset($not_replaceable[$iterator->currentSubChunk->getFullBlock($xc, $y & 0x0f, $zc)])){
-									$entity->teleport(new Vector3($real_pos->x, $y + 1 + ($entity->height / 2), $real_pos->z));
+									$entity->teleport(new Vector3($real_pos->x, $y + 1 + ($entity->size->getHeight() / 2), $real_pos->z));
 									$entity->setMotion($motion);
 									break;
 								}
@@ -131,7 +131,7 @@ class FallingBlockOptimizationComponent implements OptimizationComponent{
 								--$y;
 							}
 							if($begin - $y >= $this->falling_block_max_height){
-								$entity->teleport(new Vector3($real_pos->x, $y + 1 + ($entity->height / 2), $real_pos->z));
+								$entity->teleport(new Vector3($real_pos->x, $y + 1 + ($entity->size->getHeight() / 2), $real_pos->z));
 								$entity->setMotion($motion);
 							}
 						}
