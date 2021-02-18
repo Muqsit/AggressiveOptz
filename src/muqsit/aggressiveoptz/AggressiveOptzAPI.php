@@ -18,6 +18,7 @@ use pocketmine\scheduler\TaskScheduler;
 use pocketmine\Server;
 use ReflectionException;
 use ReflectionFunction;
+use ReflectionNamedType;
 use RuntimeException;
 
 final class AggressiveOptzAPI{
@@ -93,8 +94,8 @@ final class AggressiveOptzAPI{
 	 */
 	public function registerEvent(Closure $event_handler, int $priority = EventPriority::NORMAL, bool $handleCancelled = false) : Closure{
 		try{
-			$event_class_instance = (new ReflectionFunction($event_handler))->getParameters()[0]->getClass();
-			if($event_class_instance === null){
+			$event_class_instance = (new ReflectionFunction($event_handler))->getParameters()[0]->getType();
+			if($event_class_instance === null || !($event_class_instance instanceof ReflectionNamedType)){
 				throw new InvalidArgumentException("Invalid parameter #1 supplied to event handler");
 			}
 
