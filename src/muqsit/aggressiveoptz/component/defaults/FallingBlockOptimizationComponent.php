@@ -19,6 +19,7 @@ use pocketmine\math\Vector3;
 use pocketmine\world\utils\SubChunkExplorer;
 use pocketmine\world\utils\SubChunkExplorerStatus;
 use pocketmine\world\World;
+use function array_key_exists;
 
 class FallingBlockOptimizationComponent implements OptimizationComponent{
 	
@@ -109,7 +110,7 @@ class FallingBlockOptimizationComponent implements OptimizationComponent{
 								}
 
 								assert($iterator->currentSubChunk !== null);
-								if(isset($not_replaceable[$iterator->currentSubChunk->getFullBlock($xc, $y & 0x0f, $zc)])){
+								if(array_key_exists($iterator->currentSubChunk->getFullBlock($xc, $y & 0x0f, $zc), $not_replaceable)){
 									$entity->teleport(new Vector3($real_pos->x, $y + 1 + ($entity->size->getHeight() / 2), $real_pos->z));
 									$entity->setMotion($motion);
 									break;
@@ -124,7 +125,7 @@ class FallingBlockOptimizationComponent implements OptimizationComponent{
 								}
 
 								assert($iterator->currentSubChunk !== null);
-								if(isset($not_replaceable[$iterator->currentSubChunk->getFullBlock($xc, $y & 0x0f, $zc)])){
+								if(array_key_exists($iterator->currentSubChunk->getFullBlock($xc, $y & 0x0f, $zc), $not_replaceable)){
 									break;
 								}
 
@@ -141,7 +142,7 @@ class FallingBlockOptimizationComponent implements OptimizationComponent{
 
 			$api->registerEvent(function(EntityDespawnEvent $event) use($world_cache_manager) : void{
 				$entity = $event->getEntity();
-				if(isset($this->entity_spawn_chunks[$id = $entity->getId()])){
+				if(array_key_exists($id = $entity->getId(), $this->entity_spawn_chunks)){
 					World::getXZ($this->entity_spawn_chunks[$id], $chunkX, $chunkZ);
 					unset($this->entity_spawn_chunks[$id]);
 					$chunk = $world_cache_manager->get($world = $entity->getWorld())->getChunk($chunkX, $chunkZ);

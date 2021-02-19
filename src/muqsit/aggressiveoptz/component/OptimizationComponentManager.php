@@ -8,6 +8,7 @@ use InvalidStateException;
 use Logger;
 use muqsit\aggressiveoptz\AggressiveOptzAPI;
 use PrefixedLogger;
+use function array_key_exists;
 
 final class OptimizationComponentManager{
 
@@ -30,7 +31,7 @@ final class OptimizationComponentManager{
 	}
 
 	public function isEnabled(string $identifier) : bool{
-		return isset($this->enabled[$identifier]);
+		return array_key_exists($identifier, $this->enabled);
 	}
 
 	/**

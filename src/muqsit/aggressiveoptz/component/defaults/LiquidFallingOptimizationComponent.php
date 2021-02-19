@@ -14,6 +14,7 @@ use pocketmine\block\VanillaBlocks;
 use pocketmine\event\block\BlockSpreadEvent;
 use pocketmine\math\Vector3;
 use ReflectionProperty;
+use function array_key_exists;
 
 class LiquidFallingOptimizationComponent implements OptimizationComponent{
 
@@ -48,7 +49,7 @@ class LiquidFallingOptimizationComponent implements OptimizationComponent{
 		$air_id = VanillaBlocks::AIR()->getFullId();
 		$this->unregister = $api->registerEvent(function(BlockSpreadEvent $event) use($liquids, $air_id) : void{
 			$new_state = $event->getNewState();
-			if(isset($liquids[$new_state->getFullId()])){
+			if(array_key_exists($new_state->getFullId(), $liquids)){
 				$pos = $new_state->getPos();
 				$world = $pos->getWorld();
 

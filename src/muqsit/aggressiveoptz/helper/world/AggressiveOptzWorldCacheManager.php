@@ -11,6 +11,7 @@ use pocketmine\event\world\ChunkUnloadEvent;
 use pocketmine\event\world\WorldLoadEvent;
 use pocketmine\event\world\WorldUnloadEvent;
 use pocketmine\world\World;
+use function array_key_exists;
 
 final class AggressiveOptzWorldCacheManager{
 
@@ -52,7 +53,7 @@ final class AggressiveOptzWorldCacheManager{
 	}
 
 	private function onChunkUnload(World $world, int $x, int $z) : void{
-		if(isset($this->worlds[$id = $world->getId()])){ // WorldUnloadEvent is called before ChunkUnloadEvent :(
+		if(array_key_exists($id = $world->getId(), $this->worlds)){ // WorldUnloadEvent is called before ChunkUnloadEvent :(
 			$this->worlds[$id]->onChunkUnload($x, $z);
 		}
 	}

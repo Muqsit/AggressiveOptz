@@ -6,6 +6,7 @@ namespace muqsit\aggressiveoptz\component;
 
 use InvalidArgumentException;
 use pocketmine\utils\Utils;
+use function array_key_exists;
 
 final class OptimizationComponentFactory{
 
@@ -16,7 +17,7 @@ final class OptimizationComponentFactory{
 	private $registered = [];
 
 	public function exists(string $identifier) : bool{
-		return isset($this->registered[$identifier]);
+		return array_key_exists($identifier, $this->registered);
 	}
 
 	/**
