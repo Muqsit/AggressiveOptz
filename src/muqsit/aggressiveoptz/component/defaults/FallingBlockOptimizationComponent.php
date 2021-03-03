@@ -8,7 +8,9 @@ use Closure;
 use InvalidArgumentException;
 use InvalidStateException;
 use muqsit\aggressiveoptz\AggressiveOptzAPI;
+use muqsit\aggressiveoptz\component\defaults\utils\FallingBlockChunkInfo;
 use muqsit\aggressiveoptz\component\OptimizationComponent;
+use muqsit\aggressiveoptz\helper\world\AggressiveOptzChunkCache;
 use pocketmine\block\BlockFactory;
 use pocketmine\block\utils\Fallable;
 use pocketmine\entity\object\FallingBlock;
@@ -23,11 +25,10 @@ use function array_key_exists;
 
 class FallingBlockOptimizationComponent implements OptimizationComponent{
 	
-	private const CACHE_KEY_FALLING_BLOCKS = "aggressiveoptz:falling_block";
-	private const CACHE_KEY_FALLING_BLOCKS_QUEUE = "aggressiveoptz:falling_block_queue";
+	private const CACHE_KEY_FALLING_BLOCK_INFO = "aggressiveoptz:falling_block_info";
 
 	public static function fromConfig(array $config) : FallingBlockOptimizationComponent{
-		return new self($config["falling_block_queue_size"], $config["falling_block_max_height"]);
+		return new self($config["falling_block_queue_size"], $config["falling_block_max_height"], $config["falling_block_max_count"] ?? $config["falling_block_queue_size"]);
 	}
 
 	/** @var int */
@@ -36,13 +37,16 @@ class FallingBlockOptimizationComponent implements OptimizationComponent{
 	/** @var int */
 	private $falling_block_max_height;
 
+	/** @var int */
+	private $falling_block_max_count;
+
 	/** @var Closure[] */
 	private $unregisters = [];
 
 	/** @var int[] */
 	private $entity_spawn_chunks = [];
 
-	public function __construct(int $falling_block_queue_size, int $falling_block_max_height){
+	public function __construct(int $falling_block_queue_size, int $falling_block_max_height, int $falling_block_max_count){
 		if($falling_block_queue_size < 0){
 			throw new InvalidArgumentException("Falling block queue size cannot be negative");
 		}
@@ -55,6 +59,16 @@ class FallingBlockOptimizationComponent implements OptimizationComponent{
 			throw new InvalidArgumentException("Falling block queue size cannot be greater than falling block max height");
 		}
 		$this->falling_block_max_height = $falling_block_max_height >= World::Y_MAX ? -1 : $falling_block_max_height;
+
+		$this->falling_block_max_count = $falling_block_max_count;
+	}
+
+	private function getChunkInfo(AggressiveOptzChunkCache $chunk) : FallingBlockChunkInfo{
+		$info = $chunk->get(self::CACHE_KEY_FALLING_BLOCK_INFO);
+		if($info === null){
+			$chunk->set(self::CACHE_KEY_FALLING_BLOCK_INFO, $info = new FallingBlockChunkInfo());
+		}
+		return $info;
 	}
 
 	public function enable(AggressiveOptzAPI $api) : void{
@@ -73,7 +87,8 @@ class FallingBlockOptimizationComponent implements OptimizationComponent{
 					$chunk = $world_cache_manager->get($world)->getChunk($chunkX = $real_pos->getFloorX() >> 4, $chunkZ = $real_pos->getFloorZ() >> 4);
 					if($chunk !== null){
 						$this->entity_spawn_chunks[$entity->getId()] = World::chunkHash($chunkX, $chunkZ);
-						$chunk->set(self::CACHE_KEY_FALLING_BLOCKS, $count = $chunk->get(self::CACHE_KEY_FALLING_BLOCKS, 0) + 1);
+						$info = $this->getChunkInfo($chunk);
+						$count = ++$info->entity_count;
 					}else{
 						$count = 1;
 					}
@@ -146,13 +161,14 @@ class FallingBlockOptimizationComponent implements OptimizationComponent{
 					World::getXZ($this->entity_spawn_chunks[$id], $chunkX, $chunkZ);
 					unset($this->entity_spawn_chunks[$id]);
 					$chunk = $world_cache_manager->get($world = $entity->getWorld())->getChunk($chunkX, $chunkZ);
+
 					if($chunk !== null){
-						$chunk->set(self::CACHE_KEY_FALLING_BLOCKS, $chunk->get(self::CACHE_KEY_FALLING_BLOCKS, 0) - 1);
+						$info = $this->getChunkInfo($chunk);
+						--$info->entity_count;
 						if($world->isChunkLoaded($chunkX, $chunkZ)){
-							$queue = $chunk->get(self::CACHE_KEY_FALLING_BLOCKS_QUEUE);
-							if($queue !== null && count($queue) > 0){
-								unset($queue[$hash = array_key_first($queue)]);
-								$chunk->set(self::CACHE_KEY_FALLING_BLOCKS_QUEUE, $queue);
+							if(($hash = array_key_first($info->queued)) !== null){
+								/** @var int $hash */
+								unset($info->queued[$hash]);
 
 								World::getBlockXYZ($hash, $x, $y, $z);
 								$block = $world->getBlockAt($x, $y, $z);
@@ -174,20 +190,21 @@ class FallingBlockOptimizationComponent implements OptimizationComponent{
 					$pos = $block->getPos();
 					/** @var int $x */
 					$x = $pos->x;
-					/** @var int $y */
-					$y = $pos->y;
 					/** @var int $z */
 					$z = $pos->z;
-					$chunk = $world_cache_manager->get($pos->getWorld())->getChunk($chunkX = $x >> 4, $chunkZ = $z >> 4);
+					$chunk = $world_cache_manager->get($pos->getWorld())->getChunk($x >> 4, $z >> 4);
 					if($chunk !== null){
-						$queue = $chunk->get(self::CACHE_KEY_FALLING_BLOCKS_QUEUE, []);
-						if($chunk->get(self::CACHE_KEY_FALLING_BLOCKS, 0) >= $this->falling_block_queue_size){
+						$info = $this->getChunkInfo($chunk);
+
+						/** @var int $y */
+						$y = $pos->y;
+
+						if($info->entity_count >= $this->falling_block_max_count){
 							$event->cancel();
-							$queue[World::blockHash($x, $y, $z)] = null;
+							$info->queued[World::blockHash($x, $y, $z)] = null;
 						}else{
-							unset($queue[World::blockHash($x, $y, $z)]);
+							unset($info->queued[World::blockHash($x, $y, $z)]);
 						}
-						$chunk->set(self::CACHE_KEY_FALLING_BLOCKS_QUEUE, $queue);
 					}
 				}
 			})

@@ -3,7 +3,8 @@
         "enabled": true,
         "configuration": {
             "falling_block_queue_size": 16,
-            "falling_block_max_height": 16
+            "falling_block_max_height": 16,
+            "falling_block_max_count": 16
         }
     },
     "aggressiveoptz:liquid_falling": {
