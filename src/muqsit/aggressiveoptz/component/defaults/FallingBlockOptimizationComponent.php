@@ -31,20 +31,15 @@ class FallingBlockOptimizationComponent implements OptimizationComponent{
 		return new self($config["falling_block_queue_size"], $config["falling_block_max_height"], $config["falling_block_max_count"] ?? $config["falling_block_queue_size"]);
 	}
 
-	/** @var int */
-	private $falling_block_queue_size;
-
-	/** @var int */
-	private $falling_block_max_height;
-
-	/** @var int */
-	private $falling_block_max_count;
+	private int $falling_block_queue_size;
+	private int $falling_block_max_height;
+	private int $falling_block_max_count;
 
 	/** @var Closure[] */
-	private $unregisters = [];
+	private array $unregisters = [];
 
 	/** @var int[] */
-	private $entity_spawn_chunks = [];
+	private array $entity_spawn_chunks = [];
 
 	public function __construct(int $falling_block_queue_size, int $falling_block_max_height, int $falling_block_max_count){
 		if($falling_block_queue_size < 0){

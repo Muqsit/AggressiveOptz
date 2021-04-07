@@ -7,7 +7,7 @@ namespace muqsit\aggressiveoptz\helper\world;
 final class AggressiveOptzChunkCache{
 
 	/** @var mixed[] */
-	private $cache = [];
+	private array $cache = [];
 
 	/**
 	 * @param string $key

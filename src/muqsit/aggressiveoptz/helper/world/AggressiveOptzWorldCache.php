@@ -9,10 +9,10 @@ use pocketmine\world\World;
 final class AggressiveOptzWorldCache{
 
 	/** @var AggressiveOptzChunkCache[] */
-	private $chunks = [];
+	private array $chunks = [];
 
 	/** @var mixed[] */
-	private $cache = [];
+	private array $cache = [];
 
 	public function __construct(World $world){
 		foreach($world->getChunks() as $chunk_hash => $_){

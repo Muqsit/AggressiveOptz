@@ -14,7 +14,7 @@ final class OptimizationComponentFactory{
 	 * @var OptimizationComponent[]
 	 * @phpstan-var array<string, class-string<OptimizationComponent>>
 	 */
-	private $registered = [];
+	private array $registered = [];
 
 	public function exists(string $identifier) : bool{
 		return array_key_exists($identifier, $this->registered);

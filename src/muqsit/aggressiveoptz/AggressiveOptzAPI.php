@@ -23,17 +23,10 @@ use RuntimeException;
 
 final class AggressiveOptzAPI{
 
-	/** @var Loader */
-	private $loader;
-
-	/** @var AggressiveOptzHelper */
-	private $helper;
-
-	/** @var OptimizationComponentFactory */
-	private $component_factory;
-
-	/** @var OptimizationComponentManager */
-	private $component_manager;
+	private Loader $loader;
+	private AggressiveOptzHelper $helper;
+	private OptimizationComponentFactory $component_factory;
+	private OptimizationComponentManager $component_manager;
 
 	public function __construct(Loader $loader){
 		$this->loader = $loader;

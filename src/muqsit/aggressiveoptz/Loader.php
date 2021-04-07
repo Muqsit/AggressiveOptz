@@ -11,8 +11,7 @@ final class Loader extends PluginBase{
 
 	private const COMPONENTS_CONFIG_FILE = "components.json";
 
-	/** @var AggressiveOptzAPI */
-	private $api;
+	private AggressiveOptzAPI $api;
 
 	protected function onLoad() : void{
 		$this->saveResource(self::COMPONENTS_CONFIG_FILE);

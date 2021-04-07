@@ -16,7 +16,7 @@ use function array_key_exists;
 final class AggressiveOptzWorldCacheManager{
 
 	/** @var AggressiveOptzWorldCache[] */
-	private $worlds = [];
+	private array $worlds = [];
 
 	public function __construct(){
 	}

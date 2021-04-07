@@ -9,8 +9,7 @@ use muqsit\aggressiveoptz\helper\world\AggressiveOptzWorldCacheManager;
 
 final class AggressiveOptzHelper{
 
-	/** @var AggressiveOptzWorldCacheManager */
-	private $world_cache_manager;
+	private AggressiveOptzWorldCacheManager $world_cache_manager;
 
 	public function __construct(){
 		$this->world_cache_manager = new AggressiveOptzWorldCacheManager();

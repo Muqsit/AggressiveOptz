@@ -12,14 +12,11 @@ use function array_key_exists;
 
 final class OptimizationComponentManager{
 
-	/** @var AggressiveOptzAPI */
-	private $api;
-
-	/** @var Logger */
-	private $logger;
+	private AggressiveOptzAPI $api;
+	private Logger $logger;
 
 	/** @var OptimizationComponent[] */
-	private $enabled = [];
+	private array $enabled = [];
 
 	public function __construct(AggressiveOptzAPI $api){
 		$this->api = $api;

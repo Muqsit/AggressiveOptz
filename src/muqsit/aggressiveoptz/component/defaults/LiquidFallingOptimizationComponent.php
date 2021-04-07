@@ -22,8 +22,7 @@ class LiquidFallingOptimizationComponent implements OptimizationComponent{
 		return new self();
 	}
 
-	/** @var Closure|null */
-	private $unregister;
+	private ?Closure $unregister = null;
 
 	public function __construct(){
 	}

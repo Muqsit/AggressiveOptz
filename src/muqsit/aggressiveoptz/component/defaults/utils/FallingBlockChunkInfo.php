@@ -6,15 +6,14 @@ namespace muqsit\aggressiveoptz\component\defaults\utils;
 
 final class FallingBlockChunkInfo{
 
-	/** @var int */
-	public $entity_count = 0;
+	public int $entity_count = 0;
 
 	/**
 	 * @var null[]
 	 *
 	 * @phpstan-var array<int, null>
 	 */
-	public $queued = [];
+	public array $queued = [];
 
 	public function __construct(){
 	}
