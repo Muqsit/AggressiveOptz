@@ -19,6 +19,8 @@ final class Loader extends PluginBase{
 	}
 
 	protected function onEnable() : void{
+		$this->api->load();
+
 		$contents = file_get_contents($this->getDataFolder() . self::COMPONENTS_CONFIG_FILE);
 		if($contents === false){
 			throw new InvalidStateException("Failed to load default configuration file: " . self::COMPONENTS_CONFIG_FILE);

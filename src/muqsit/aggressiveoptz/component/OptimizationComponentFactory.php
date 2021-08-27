@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace muqsit\aggressiveoptz\component;
 
 use InvalidArgumentException;
-use pocketmine\utils\Utils;
 use function array_key_exists;
 
 final class OptimizationComponentFactory{
@@ -31,7 +30,6 @@ final class OptimizationComponentFactory{
 			throw new InvalidArgumentException("Tried to override an already existing component with the identifier \"{$identifier}\" ({$this->registered[$identifier]})");
 		}
 
-		Utils::testValidInstance($component, OptimizationComponent::class);
 		$this->registered[$identifier] = $component;
 	}
 

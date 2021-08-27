@@ -31,6 +31,9 @@ final class AggressiveOptzAPI{
 	public function __construct(Loader $loader){
 		$this->loader = $loader;
 		$this->helper = new AggressiveOptzHelper();
+	}
+
+	public function load() : void{
 		$this->loadComponent();
 	}
 
