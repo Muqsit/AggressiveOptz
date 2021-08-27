@@ -49,7 +49,7 @@ class LiquidFallingOptimizationComponent implements OptimizationComponent{
 		$this->unregister = $api->registerEvent(function(BlockSpreadEvent $event) use($liquids, $air_id) : void{
 			$new_state = $event->getNewState();
 			if(array_key_exists($new_state->getFullId(), $liquids)){
-				$pos = $new_state->getPos();
+				$pos = $new_state->getPosition();
 				$world = $pos->getWorld();
 
 				/** @var int $x */

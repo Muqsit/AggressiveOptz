@@ -182,7 +182,7 @@ class FallingBlockOptimizationComponent implements OptimizationComponent{
 			$api->registerEvent(function(BlockUpdateEvent $event) use($world_cache_manager) : void{
 				$block = $event->getBlock();
 				if($block instanceof Fallable){
-					$pos = $block->getPos();
+					$pos = $block->getPosition();
 					/** @var int $x */
 					$x = $pos->x;
 					/** @var int $z */
