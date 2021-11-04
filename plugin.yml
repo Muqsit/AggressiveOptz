@@ -1,4 +1,4 @@
 name: AggressiveOptz
 main: muqsit\aggressiveoptz\Loader
-api: 4.0.0
+api: [4.0.0-BETA10, 4.0.0-BETA11]
 version: 0.0.1

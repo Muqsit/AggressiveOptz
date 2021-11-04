@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace muqsit\aggressiveoptz\component;
 
-use InvalidStateException;
+use InvalidArgumentException;
 use Logger;
 use muqsit\aggressiveoptz\AggressiveOptzAPI;
 use PrefixedLogger;
@@ -37,7 +37,7 @@ final class OptimizationComponentManager{
 	 */
 	public function enable(string $identifier, array $config) : void{
 		if($this->isEnabled($identifier)){
-			throw new InvalidStateException("Tried to enable an already enabled component: {$identifier}");
+			throw new InvalidArgumentException("Tried to enable an already enabled component: {$identifier}");
 		}
 
 		$this->enabled[$identifier] = $this->api->getComponentFactory()->build($identifier, $config);
@@ -47,7 +47,7 @@ final class OptimizationComponentManager{
 
 	public function disable(string $identifier) : void{
 		if(!$this->isEnabled($identifier)){
-			throw new InvalidStateException("Tried to disable an already disabled component: {$identifier}");
+			throw new InvalidArgumentException("Tried to disable an already disabled component: {$identifier}");
 		}
 
 		$this->enabled[$identifier]->disable($this->api);
