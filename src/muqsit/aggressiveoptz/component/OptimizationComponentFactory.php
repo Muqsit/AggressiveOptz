@@ -9,10 +9,7 @@ use function array_key_exists;
 
 final class OptimizationComponentFactory{
 
-	/**
-	 * @var OptimizationComponent[]
-	 * @phpstan-var array<string, class-string<OptimizationComponent>>
-	 */
+	/** @var array<string, class-string<OptimizationComponent>> */
 	private array $registered = [];
 
 	public function exists(string $identifier) : bool{
@@ -21,9 +18,7 @@ final class OptimizationComponentFactory{
 
 	/**
 	 * @param string $identifier
-	 * @param string $component
-	 *
-	 * @phpstan-param class-string<OptimizationComponent> $component
+	 * @param class-string<OptimizationComponent> $component
 	 */
 	public function register(string $identifier, string $component) : void{
 		if($this->exists(($identifier))){

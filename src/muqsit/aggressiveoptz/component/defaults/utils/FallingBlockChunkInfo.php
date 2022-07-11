@@ -8,11 +8,7 @@ final class FallingBlockChunkInfo{
 
 	public int $entity_count = 0;
 
-	/**
-	 * @var null[]
-	 *
-	 * @phpstan-var array<int, null>
-	 */
+	/** @var array<int, null> */
 	public array $queued = [];
 
 	public function __construct(){

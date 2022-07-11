@@ -79,13 +79,10 @@ final class AggressiveOptzAPI{
 	 * Registers an event handler and returns a closure which unregisters
 	 * the handler.
 	 *
-	 * @param Closure $event_handler
+	 * @template TEvent of \pocketmine\event\Event
+	 * @param Closure(TEvent) : void $event_handler
 	 * @param int $priority
 	 * @param bool $handleCancelled
-	 *
-	 * @phpstan-template TEvent of \pocketmine\event\Event
-	 * @phpstan-param Closure(TEvent) : void $event_handler
-	 *
 	 * @return Closure() : void
 	 */
 	public function registerEvent(Closure $event_handler, int $priority = EventPriority::NORMAL, bool $handleCancelled = false) : Closure{
@@ -95,7 +92,7 @@ final class AggressiveOptzAPI{
 				throw new InvalidArgumentException("Invalid parameter #1 supplied to event handler");
 			}
 
-			/** @phpstan-var class-string<TEvent> $event_class */
+			/** @var class-string<TEvent> $event_class */
 			$event_class = $event_class_instance->getName();
 
 			$this->getServer()->getPluginManager()->registerEvent($event_class, $event_handler, $priority, $this->loader, $handleCancelled);

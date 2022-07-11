@@ -38,9 +38,7 @@ final class Loader extends PluginBase{
 	}
 
 	/**
-	 * @param array<string, mixed> $config
-	 *
-	 * @phpstan-param array<string, array{enabled: bool, configuration: array<string, mixed>}> $config
+	 * @param array<string, array{enabled: bool, configuration: array<string, mixed>}> $config
 	 */
 	public function loadComponentsFromConfig(array $config) : void{
 		$component_manager = $this->api->getComponentManager();
