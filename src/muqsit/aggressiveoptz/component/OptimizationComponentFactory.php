@@ -21,7 +21,7 @@ final class OptimizationComponentFactory{
 	 * @param class-string<OptimizationComponent> $component
 	 */
 	public function register(string $identifier, string $component) : void{
-		if($this->exists(($identifier))){
+		if($this->exists($identifier)){
 			throw new InvalidArgumentException("Tried to override an already existing component with the identifier \"{$identifier}\" ({$this->registered[$identifier]})");
 		}
 
