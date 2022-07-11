@@ -11,7 +11,7 @@ final class AggressiveOptzWorldCache{
 	/** @var AggressiveOptzChunkCache[] */
 	private array $chunks = [];
 
-	/** @var mixed[] */
+	/** @var array<string, mixed> */
 	private array $cache = [];
 
 	public function __construct(World $world){
@@ -33,11 +33,7 @@ final class AggressiveOptzWorldCache{
 		return $this->chunks[World::chunkHash($x, $z)] ?? null;
 	}
 
-	/**
-	 * @param string $key
-	 * @param mixed|null $value
-	 */
-	public function set(string $key, $value) : void{
+	public function set(string $key, mixed $value) : void{
 		$this->cache[$key] = $value;
 	}
 
@@ -45,12 +41,7 @@ final class AggressiveOptzWorldCache{
 		unset($this->cache[$key]);
 	}
 
-	/**
-	 * @param string $key
-	 * @param mixed|null $default
-	 * @return mixed|null
-	 */
-	public function get(string $key, $default = null){
+	public function get(string $key, mixed $default = null) : mixed{
 		return $this->cache[$key] ?? $default;
 	}
 }

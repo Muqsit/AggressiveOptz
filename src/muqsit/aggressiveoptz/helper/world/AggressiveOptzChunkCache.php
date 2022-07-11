@@ -6,14 +6,10 @@ namespace muqsit\aggressiveoptz\helper\world;
 
 final class AggressiveOptzChunkCache{
 
-	/** @var mixed[] */
+	/** @var array<string, mixed> */
 	private array $cache = [];
 
-	/**
-	 * @param string $key
-	 * @param mixed|null $value
-	 */
-	public function set(string $key, $value) : void{
+	public function set(string $key, mixed $value) : void{
 		$this->cache[$key] = $value;
 	}
 
@@ -21,12 +17,7 @@ final class AggressiveOptzChunkCache{
 		unset($this->cache[$key]);
 	}
 
-	/**
-	 * @param string $key
-	 * @param mixed|null $default
-	 * @return mixed|null
-	 */
-	public function get(string $key, $default = null){
+	public function get(string $key, mixed $default = null) : mixed{
 		return $this->cache[$key] ?? $default;
 	}
 }
