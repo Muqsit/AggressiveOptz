@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace muqsit\aggressiveoptz\helper;
 
-use muqsit\aggressiveoptz\AggressiveOptzAPI;
+use muqsit\aggressiveoptz\AggressiveOptzApi;
 use muqsit\aggressiveoptz\helper\world\AggressiveOptzWorldCacheManager;
 
 final class AggressiveOptzHelper{
@@ -15,7 +15,7 @@ final class AggressiveOptzHelper{
 		$this->world_cache_manager = new AggressiveOptzWorldCacheManager();
 	}
 
-	public function init(AggressiveOptzAPI $api) : void{
+	public function init(AggressiveOptzApi $api) : void{
 		$this->world_cache_manager->init($api);
 	}
 

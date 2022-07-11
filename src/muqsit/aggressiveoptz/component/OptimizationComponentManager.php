@@ -6,19 +6,19 @@ namespace muqsit\aggressiveoptz\component;
 
 use InvalidArgumentException;
 use Logger;
-use muqsit\aggressiveoptz\AggressiveOptzAPI;
+use muqsit\aggressiveoptz\AggressiveOptzApi;
 use PrefixedLogger;
 use function array_key_exists;
 
 final class OptimizationComponentManager{
 
-	private AggressiveOptzAPI $api;
+	private AggressiveOptzApi $api;
 	private Logger $logger;
 
 	/** @var OptimizationComponent[] */
 	private array $enabled = [];
 
-	public function __construct(AggressiveOptzAPI $api){
+	public function __construct(AggressiveOptzApi $api){
 		$this->api = $api;
 		$this->logger = new PrefixedLogger($api->getLogger(), "OC-Manager");
 	}

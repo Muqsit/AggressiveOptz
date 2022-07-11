@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace muqsit\aggressiveoptz\helper\world;
 
-use muqsit\aggressiveoptz\AggressiveOptzAPI;
+use muqsit\aggressiveoptz\AggressiveOptzApi;
 use pocketmine\event\EventPriority;
 use pocketmine\event\world\ChunkLoadEvent;
 use pocketmine\event\world\ChunkUnloadEvent;
@@ -21,7 +21,7 @@ final class AggressiveOptzWorldCacheManager{
 	public function __construct(){
 	}
 
-	public function init(AggressiveOptzAPI $api) : void{
+	public function init(AggressiveOptzApi $api) : void{
 		$api->registerEvent(function(WorldLoadEvent $event) : void{
 			$this->onWorldLoad($event->getWorld());
 		}, EventPriority::LOWEST);

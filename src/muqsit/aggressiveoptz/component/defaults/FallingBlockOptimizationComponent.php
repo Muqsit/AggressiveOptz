@@ -7,7 +7,7 @@ namespace muqsit\aggressiveoptz\component\defaults;
 use Closure;
 use InvalidArgumentException;
 use LogicException;
-use muqsit\aggressiveoptz\AggressiveOptzAPI;
+use muqsit\aggressiveoptz\AggressiveOptzApi;
 use muqsit\aggressiveoptz\component\defaults\utils\FallingBlockChunkInfo;
 use muqsit\aggressiveoptz\component\OptimizationComponent;
 use muqsit\aggressiveoptz\helper\world\AggressiveOptzChunkCache;
@@ -67,7 +67,7 @@ class FallingBlockOptimizationComponent implements OptimizationComponent{
 		return $info;
 	}
 
-	public function enable(AggressiveOptzAPI $api) : void{
+	public function enable(AggressiveOptzApi $api) : void{
 		if(count($this->unregisters) > 0){
 			throw new LogicException("Tried to register event handlers twice");
 		}
@@ -207,7 +207,7 @@ class FallingBlockOptimizationComponent implements OptimizationComponent{
 		];
 	}
 
-	public function disable(AggressiveOptzAPI $api) : void{
+	public function disable(AggressiveOptzApi $api) : void{
 		if(count($this->unregisters) === 0){
 			throw new LogicException("Tried to unregister an unregistered event handler");
 		}

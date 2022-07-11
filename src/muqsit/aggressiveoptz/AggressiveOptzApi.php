@@ -21,7 +21,7 @@ use ReflectionFunction;
 use ReflectionNamedType;
 use RuntimeException;
 
-final class AggressiveOptzAPI{
+final class AggressiveOptzApi{
 
 	private Loader $loader;
 	private AggressiveOptzHelper $helper;

@@ -11,11 +11,11 @@ final class Loader extends PluginBase{
 
 	private const COMPONENTS_CONFIG_FILE = "components.json";
 
-	private AggressiveOptzAPI $api;
+	private AggressiveOptzApi $api;
 
 	protected function onLoad() : void{
 		$this->saveResource(self::COMPONENTS_CONFIG_FILE);
-		$this->api = new AggressiveOptzAPI($this);
+		$this->api = new AggressiveOptzApi($this);
 	}
 
 	protected function onEnable() : void{
@@ -33,7 +33,7 @@ final class Loader extends PluginBase{
 	protected function onDisable() : void{
 	}
 
-	public function getApi() : AggressiveOptzAPI{
+	public function getApi() : AggressiveOptzApi{
 		return $this->api;
 	}
 

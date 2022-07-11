@@ -6,7 +6,7 @@ namespace muqsit\aggressiveoptz\component\defaults;
 
 use Closure;
 use LogicException;
-use muqsit\aggressiveoptz\AggressiveOptzAPI;
+use muqsit\aggressiveoptz\AggressiveOptzApi;
 use muqsit\aggressiveoptz\component\OptimizationComponent;
 use pocketmine\block\BlockFactory as VanillaBlockFactory;
 use pocketmine\block\Liquid;
@@ -28,7 +28,7 @@ class LiquidFallingOptimizationComponent implements OptimizationComponent{
 	public function __construct(){
 	}
 
-	public function enable(AggressiveOptzAPI $api) : void{
+	public function enable(AggressiveOptzApi $api) : void{
 		if($this->unregister !== null){
 			throw new LogicException("Tried to register event handler twice");
 		}
@@ -83,7 +83,7 @@ class LiquidFallingOptimizationComponent implements OptimizationComponent{
 		});
 	}
 
-	public function disable(AggressiveOptzAPI $api) : void{
+	public function disable(AggressiveOptzApi $api) : void{
 		if($this->unregister === null){
 			throw new LogicException("Tried to unregister an unregistered event handler");
 		}
