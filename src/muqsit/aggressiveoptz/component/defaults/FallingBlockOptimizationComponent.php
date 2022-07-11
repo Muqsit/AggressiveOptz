@@ -18,6 +18,7 @@ use pocketmine\event\block\BlockUpdateEvent;
 use pocketmine\event\entity\EntityDespawnEvent;
 use pocketmine\event\entity\EntitySpawnEvent;
 use pocketmine\math\Vector3;
+use pocketmine\world\format\Chunk;
 use pocketmine\world\utils\SubChunkExplorer;
 use pocketmine\world\utils\SubChunkExplorerStatus;
 use pocketmine\world\World;
@@ -79,7 +80,7 @@ class FallingBlockOptimizationComponent implements OptimizationComponent{
 					$real_pos = $entity->getPosition();
 					$world = $real_pos->getWorld();
 
-					$chunk = $world_cache_manager->get($world)->getChunk($chunkX = $real_pos->getFloorX() >> 4, $chunkZ = $real_pos->getFloorZ() >> 4);
+					$chunk = $world_cache_manager->get($world)->getChunk($chunkX = $real_pos->getFloorX() >> Chunk::COORD_BIT_SIZE, $chunkZ = $real_pos->getFloorZ() >> Chunk::COORD_BIT_SIZE);
 					if($chunk !== null){
 						$this->entity_spawn_chunks[$entity->getId()] = World::chunkHash($chunkX, $chunkZ);
 						$info = $this->getChunkInfo($chunk);
@@ -100,8 +101,8 @@ class FallingBlockOptimizationComponent implements OptimizationComponent{
 						/** @var int $z */
 						$z = $pos->z;
 
-						$xc = $x & 0x0f;
-						$zc = $z & 0x0f;
+						$xc = $x & Chunk::COORD_MASK;
+						$zc = $z & Chunk::COORD_MASK;
 
 						static $not_replaceable = null;
 						if($not_replaceable === null){
@@ -120,7 +121,7 @@ class FallingBlockOptimizationComponent implements OptimizationComponent{
 								}
 
 								assert($iterator->currentSubChunk !== null);
-								if(array_key_exists($iterator->currentSubChunk->getFullBlock($xc, $y & 0x0f, $zc), $not_replaceable)){
+								if(array_key_exists($iterator->currentSubChunk->getFullBlock($xc, $y & Chunk::COORD_MASK, $zc), $not_replaceable)){
 									$entity->teleport(new Vector3($real_pos->x, $y + 1 + ($entity->size->getHeight() / 2), $real_pos->z));
 									$entity->setMotion($motion);
 									break;
@@ -135,7 +136,7 @@ class FallingBlockOptimizationComponent implements OptimizationComponent{
 								}
 
 								assert($iterator->currentSubChunk !== null);
-								if(array_key_exists($iterator->currentSubChunk->getFullBlock($xc, $y & 0x0f, $zc), $not_replaceable)){
+								if(array_key_exists($iterator->currentSubChunk->getFullBlock($xc, $y & Chunk::COORD_MASK, $zc), $not_replaceable)){
 									break;
 								}
 
@@ -187,7 +188,7 @@ class FallingBlockOptimizationComponent implements OptimizationComponent{
 					$x = $pos->x;
 					/** @var int $z */
 					$z = $pos->z;
-					$chunk = $world_cache_manager->get($pos->getWorld())->getChunk($x >> 4, $z >> 4);
+					$chunk = $world_cache_manager->get($pos->getWorld())->getChunk($x >> Chunk::COORD_BIT_SIZE, $z >> Chunk::COORD_BIT_SIZE);
 					if($chunk !== null){
 						$info = $this->getChunkInfo($chunk);
 

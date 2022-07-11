@@ -13,6 +13,7 @@ use pocketmine\block\Liquid;
 use pocketmine\block\VanillaBlocks;
 use pocketmine\event\block\BlockSpreadEvent;
 use pocketmine\math\Vector3;
+use pocketmine\world\format\Chunk;
 use ReflectionProperty;
 use function array_key_exists;
 
@@ -59,10 +60,10 @@ class LiquidFallingOptimizationComponent implements OptimizationComponent{
 				/** @var int $z */
 				$z = $pos->z;
 
-				$chunk = $world->getChunk($x >> 4, $z >> 4);
+				$chunk = $world->getChunk($x >> Chunk::COORD_BIT_SIZE, $z >> Chunk::COORD_BIT_SIZE);
 				if($chunk !== null){
-					$xc = $x & 0x0f;
-					$zc = $z & 0x0f;
+					$xc = $x & Chunk::COORD_MASK;
+					$zc = $z & Chunk::COORD_MASK;
 					$last_y = null;
 					while(--$y >= 0){
 						if($chunk->getFullBlock($xc, $y, $zc) !== $air_id){
