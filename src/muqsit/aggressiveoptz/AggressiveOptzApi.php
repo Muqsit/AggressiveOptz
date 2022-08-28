@@ -86,31 +86,21 @@ final class AggressiveOptzApi{
 	 * @return Closure() : void
 	 */
 	public function registerEvent(Closure $event_handler, int $priority = EventPriority::NORMAL, bool $handleCancelled = false) : Closure{
+		$event_class_instance = (new ReflectionFunction($event_handler))->getParameters()[0]->getType();
+		if(!($event_class_instance instanceof ReflectionNamedType)){
+			throw new InvalidArgumentException("Invalid parameter #1 supplied to event handler");
+		}
+
+		/** @var class-string<TEvent> $event_class */
+		$event_class = $event_class_instance->getName();
 		try{
-			$event_class_instance = (new ReflectionFunction($event_handler))->getParameters()[0]->getType();
-			if(!($event_class_instance instanceof ReflectionNamedType)){
-				throw new InvalidArgumentException("Invalid parameter #1 supplied to event handler");
-			}
-
-			/** @var class-string<TEvent> $event_class */
-			$event_class = $event_class_instance->getName();
-
-			$this->getServer()->getPluginManager()->registerEvent($event_class, $event_handler, $priority, $this->loader, $handleCancelled);
-
-			$listener = null;
-			foreach(HandlerListManager::global()->getListFor($event_class)->getListenersByPriority($priority) as $entry){
-				if($entry->getHandler() === $event_handler){
-					$listener = $entry;
-					break;
-				}
-			}
-			assert($listener !== null);
-
-			return static function() use($event_class, $listener) : void{
-				HandlerListManager::global()->getListFor($event_class)->unregister($listener);
-			};
+			$listener = $this->getServer()->getPluginManager()->registerEvent($event_class, $event_handler, $priority, $this->loader, $handleCancelled);
 		}catch(ReflectionException $e){
 			throw new RuntimeException($e->getMessage(), $e->getCode(), $e);
 		}
+
+		return static function() use($event_class, $listener) : void{
+			HandlerListManager::global()->getListFor($event_class)->unregister($listener);
+		};
 	}
 }
