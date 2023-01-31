@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace muqsit\aggressiveoptz;
 
-use LogicException;
 use pocketmine\plugin\PluginBase;
+use pocketmine\utils\Filesystem;
 
 final class Loader extends PluginBase{
 
@@ -21,10 +21,7 @@ final class Loader extends PluginBase{
 	protected function onEnable() : void{
 		$this->api->load();
 
-		$contents = file_get_contents($this->getDataFolder() . self::COMPONENTS_CONFIG_FILE);
-		if($contents === false){
-			throw new LogicException("Failed to load default configuration file: " . self::COMPONENTS_CONFIG_FILE);
-		}
+		$contents = Filesystem::fileGetContents($this->getDataFolder() . self::COMPONENTS_CONFIG_FILE);
 		$this->loadComponentsFromConfig(json_decode($contents, true, 512, JSON_THROW_ON_ERROR));
 
 		$this->api->init();
