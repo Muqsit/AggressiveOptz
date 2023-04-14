@@ -12,6 +12,7 @@ use muqsit\aggressiveoptz\component\defaults\LiquidFallingOptimizationComponent;
 use muqsit\aggressiveoptz\component\OptimizationComponentFactory;
 use muqsit\aggressiveoptz\component\OptimizationComponentManager;
 use muqsit\aggressiveoptz\helper\AggressiveOptzHelper;
+use pocketmine\event\Event;
 use pocketmine\event\EventPriority;
 use pocketmine\event\HandlerListManager;
 use pocketmine\scheduler\TaskScheduler;
@@ -79,7 +80,7 @@ final class AggressiveOptzApi{
 	 * Registers an event handler and returns a closure which unregisters
 	 * the handler.
 	 *
-	 * @template TEvent of \pocketmine\event\Event
+	 * @template TEvent of Event
 	 * @param Closure(TEvent) : void $event_handler
 	 * @param int $priority
 	 * @param bool $handleCancelled
