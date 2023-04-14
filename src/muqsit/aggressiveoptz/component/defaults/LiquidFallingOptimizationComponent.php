@@ -49,35 +49,40 @@ class LiquidFallingOptimizationComponent implements OptimizationComponent{
 		$air_id = VanillaBlocks::AIR()->getFullId();
 		$this->unregister = $api->registerEvent(function(BlockSpreadEvent $event) use($liquids, $air_id) : void{
 			$new_state = $event->getNewState();
-			if(array_key_exists($new_state->getFullId(), $liquids)){
-				$pos = $new_state->getPosition();
-				$world = $pos->getWorld();
+			if(!array_key_exists($new_state->getFullId(), $liquids)){
+				return;
+			}
 
-				/** @var int $x */
-				$x = $pos->x;
-				/** @var int $y */
-				$y = $pos->y;
-				/** @var int $z */
-				$z = $pos->z;
+			$pos = $new_state->getPosition();
+			$world = $pos->getWorld();
 
-				$chunk = $world->getChunk($x >> Chunk::COORD_BIT_SIZE, $z >> Chunk::COORD_BIT_SIZE);
-				if($chunk !== null){
-					$xc = $x & Chunk::COORD_MASK;
-					$zc = $z & Chunk::COORD_MASK;
-					$last_y = null;
-					while(--$y >= 0){
-						if($chunk->getFullBlock($xc, $y, $zc) !== $air_id){
-							break;
-						}
-						$world->setBlockAt($x, $y, $z, $new_state, false);
-						$last_y = $y;
-					}
-					if($last_y !== null){
-						$source = $event->getSource();
-						if($source instanceof Liquid){
-							$world->scheduleDelayedBlockUpdate(new Vector3($x, $last_y, $z), max(1, $source->tickRate()));
-						}
-					}
+			/** @var int $x */
+			$x = $pos->x;
+			/** @var int $y */
+			$y = $pos->y;
+			/** @var int $z */
+			$z = $pos->z;
+
+			$chunk = $world->getChunk($x >> Chunk::COORD_BIT_SIZE, $z >> Chunk::COORD_BIT_SIZE);
+			if($chunk === null){
+				return;
+			}
+
+			$xc = $x & Chunk::COORD_MASK;
+			$zc = $z & Chunk::COORD_MASK;
+			$last_y = null;
+			while(--$y >= 0){
+				if($chunk->getFullBlock($xc, $y, $zc) !== $air_id){
+					break;
+				}
+				$world->setBlockAt($x, $y, $z, $new_state, false);
+				$last_y = $y;
+			}
+
+			if($last_y !== null){
+				$source = $event->getSource();
+				if($source instanceof Liquid){
+					$world->scheduleDelayedBlockUpdate(new Vector3($x, $last_y, $z), max(1, $source->tickRate()));
 				}
 			}
 		});
