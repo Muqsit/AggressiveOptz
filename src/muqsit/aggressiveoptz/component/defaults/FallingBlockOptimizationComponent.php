@@ -11,6 +11,7 @@ use muqsit\aggressiveoptz\AggressiveOptzApi;
 use muqsit\aggressiveoptz\component\defaults\utils\FallingBlockChunkInfo;
 use muqsit\aggressiveoptz\component\OptimizationComponent;
 use muqsit\aggressiveoptz\helper\world\AggressiveOptzChunkCache;
+use muqsit\aggressiveoptz\helper\world\AggressiveOptzWorldCache;
 use pocketmine\block\BlockFactory;
 use pocketmine\block\utils\Fallable;
 use pocketmine\entity\object\FallingBlock;
@@ -215,6 +216,12 @@ class FallingBlockOptimizationComponent implements OptimizationComponent{
 					$info->queued[World::blockHash($x, $y, $z)] = null;
 				}else{
 					unset($info->queued[World::blockHash($x, $y, $z)]);
+				}
+			}),
+
+			$world_cache_manager->registerUnloadListener(function(World $world, AggressiveOptzWorldCache $cache) : void{
+				foreach($world->getEntities() as $entity){
+					unset($this->entity_spawn_chunks[$entity->getId()]);
 				}
 			})
 		];
