@@ -15,7 +15,7 @@ final class OptimizationComponentManager{
 	private AggressiveOptzApi $api;
 	private Logger $logger;
 
-	/** @var OptimizationComponent[] */
+	/** @var array<string, OptimizationComponent> */
 	private array $enabled = [];
 
 	public function __construct(AggressiveOptzApi $api){

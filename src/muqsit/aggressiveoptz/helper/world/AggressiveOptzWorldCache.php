@@ -8,7 +8,7 @@ use pocketmine\world\World;
 
 final class AggressiveOptzWorldCache{
 
-	/** @var AggressiveOptzChunkCache[] */
+	/** @var array<int, AggressiveOptzChunkCache> */
 	private array $chunks = [];
 
 	/** @var array<string, mixed> */

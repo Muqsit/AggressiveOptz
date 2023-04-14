@@ -36,10 +36,10 @@ class FallingBlockOptimizationComponent implements OptimizationComponent{
 	private int $falling_block_max_height;
 	private int $falling_block_max_count;
 
-	/** @var Closure[] */
+	/** @var list<Closure> */
 	private array $unregisters = [];
 
-	/** @var int[] */
+	/** @var array<int, int> */
 	private array $entity_spawn_chunks = [];
 
 	public function __construct(int $falling_block_queue_size, int $falling_block_max_height, int $falling_block_max_count){
