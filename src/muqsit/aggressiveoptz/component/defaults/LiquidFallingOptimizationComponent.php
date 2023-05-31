@@ -14,7 +14,6 @@ use pocketmine\block\VanillaBlocks;
 use pocketmine\event\block\BlockSpreadEvent;
 use pocketmine\math\Vector3;
 use pocketmine\world\format\Chunk;
-use ReflectionProperty;
 use function array_key_exists;
 
 class LiquidFallingOptimizationComponent implements OptimizationComponent{
@@ -33,15 +32,9 @@ class LiquidFallingOptimizationComponent implements OptimizationComponent{
 			throw new LogicException("Tried to register event handler twice");
 		}
 
-		$_falling = new ReflectionProperty(Liquid::class, "falling");
-		$_falling->setAccessible(true);
-
-		$_decay = new ReflectionProperty(Liquid::class, "decay");
-		$_decay->setAccessible(true);
-
 		$liquids = [];
 		foreach(VanillaBlockFactory::getInstance()->getAllKnownStates() as $block){
-			if($block instanceof Liquid && $_falling->getValue($block) && $_decay->getValue($block) === 0){
+			if($block instanceof Liquid && $block->isFalling() && $block->getDecay() === 0){
 				$liquids[$block->getFullId()] = true;
 			}
 		}
