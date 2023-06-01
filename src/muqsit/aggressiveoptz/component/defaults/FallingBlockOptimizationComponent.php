@@ -12,7 +12,7 @@ use muqsit\aggressiveoptz\component\defaults\utils\FallingBlockChunkInfo;
 use muqsit\aggressiveoptz\component\OptimizationComponent;
 use muqsit\aggressiveoptz\helper\world\AggressiveOptzChunkCache;
 use muqsit\aggressiveoptz\helper\world\AggressiveOptzWorldCache;
-use pocketmine\block\BlockFactory;
+use pocketmine\block\RuntimeBlockStateRegistry;
 use pocketmine\block\utils\Fallable;
 use pocketmine\entity\object\FallingBlock;
 use pocketmine\event\block\BlockUpdateEvent;
@@ -115,9 +115,10 @@ class FallingBlockOptimizationComponent implements OptimizationComponent{
 				static $not_replaceable = null;
 				if($not_replaceable === null){
 					$not_replaceable = [];
-					foreach(BlockFactory::getInstance()->getAllKnownStates() as $state){
+
+					foreach(RuntimeBlockStateRegistry::getInstance()->getAllKnownStates() as $state){
 						if(!$state->canBeReplaced()){
-							$not_replaceable[$state->getFullId()] = true;
+							$not_replaceable[$state->getStateId()] = true;
 						}
 					}
 				}
@@ -129,7 +130,7 @@ class FallingBlockOptimizationComponent implements OptimizationComponent{
 						}
 
 						assert($iterator->currentSubChunk !== null);
-						if(array_key_exists($iterator->currentSubChunk->getFullBlock($xc, $y & Chunk::COORD_MASK, $zc), $not_replaceable)){
+						if(array_key_exists($iterator->currentSubChunk->getBlockStateId($xc, $y & Chunk::COORD_MASK, $zc), $not_replaceable)){
 							$entity->teleport(new Vector3($real_pos->x, $y + 1 + ($entity->size->getHeight() / 2), $real_pos->z));
 							$entity->setMotion($motion);
 							break;
@@ -144,7 +145,7 @@ class FallingBlockOptimizationComponent implements OptimizationComponent{
 						}
 
 						assert($iterator->currentSubChunk !== null);
-						if(array_key_exists($iterator->currentSubChunk->getFullBlock($xc, $y & Chunk::COORD_MASK, $zc), $not_replaceable)){
+						if(array_key_exists($iterator->currentSubChunk->getBlockStateId($xc, $y & Chunk::COORD_MASK, $zc), $not_replaceable)){
 							break;
 						}
 

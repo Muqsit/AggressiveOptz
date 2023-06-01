@@ -8,8 +8,8 @@ use Closure;
 use LogicException;
 use muqsit\aggressiveoptz\AggressiveOptzApi;
 use muqsit\aggressiveoptz\component\OptimizationComponent;
-use pocketmine\block\BlockFactory as VanillaBlockFactory;
 use pocketmine\block\Liquid;
+use pocketmine\block\RuntimeBlockStateRegistry;
 use pocketmine\block\VanillaBlocks;
 use pocketmine\event\block\BlockSpreadEvent;
 use pocketmine\math\Vector3;
@@ -33,16 +33,16 @@ class LiquidFallingOptimizationComponent implements OptimizationComponent{
 		}
 
 		$liquids = [];
-		foreach(VanillaBlockFactory::getInstance()->getAllKnownStates() as $block){
+		foreach(RuntimeBlockStateRegistry::getInstance()->getAllKnownStates() as $block){
 			if($block instanceof Liquid && $block->isFalling() && $block->getDecay() === 0){
-				$liquids[$block->getFullId()] = true;
+				$liquids[$block->getStateId()] = true;
 			}
 		}
 
-		$air_id = VanillaBlocks::AIR()->getFullId();
+		$air_id = VanillaBlocks::AIR()->getStateId();
 		$this->unregister = $api->registerEvent(function(BlockSpreadEvent $event) use($liquids, $air_id) : void{
 			$new_state = $event->getNewState();
-			if(!array_key_exists($new_state->getFullId(), $liquids)){
+			if(!array_key_exists($new_state->getStateId(), $liquids)){
 				return;
 			}
 
@@ -65,7 +65,7 @@ class LiquidFallingOptimizationComponent implements OptimizationComponent{
 			$zc = $z & Chunk::COORD_MASK;
 			$last_y = null;
 			while(--$y >= 0){
-				if($chunk->getFullBlock($xc, $y, $zc) !== $air_id){
+				if($chunk->getBlockStateId($xc, $y, $zc) !== $air_id){
 					break;
 				}
 				$world->setBlockAt($x, $y, $z, $new_state, false);
