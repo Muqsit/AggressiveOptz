@@ -9,6 +9,7 @@ use InvalidArgumentException;
 use Logger;
 use muqsit\aggressiveoptz\component\defaults\FallingBlockOptimizationComponent;
 use muqsit\aggressiveoptz\component\defaults\LiquidFallingOptimizationComponent;
+use muqsit\aggressiveoptz\component\defaults\NetworkItemOptimizationComponent;
 use muqsit\aggressiveoptz\component\OptimizationComponentFactory;
 use muqsit\aggressiveoptz\component\OptimizationComponentManager;
 use muqsit\aggressiveoptz\helper\AggressiveOptzHelper;
@@ -44,6 +45,7 @@ final class AggressiveOptzApi{
 		$this->component_factory = new OptimizationComponentFactory();
 		$this->component_factory->register("{$prefix}:falling_block", FallingBlockOptimizationComponent::class);
 		$this->component_factory->register("{$prefix}:liquid_falling", LiquidFallingOptimizationComponent::class);
+		$this->component_factory->register("{$prefix}:network_item", NetworkItemOptimizationComponent::class);
 
 		$this->component_manager = new OptimizationComponentManager($this);
 	}
