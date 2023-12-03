@@ -12,8 +12,10 @@ use muqsit\aggressiveoptz\component\defaults\utils\FallingBlockChunkInfo;
 use muqsit\aggressiveoptz\component\OptimizationComponent;
 use muqsit\aggressiveoptz\helper\world\AggressiveOptzChunkCache;
 use muqsit\aggressiveoptz\helper\world\AggressiveOptzWorldCache;
+use pocketmine\block\Air;
 use pocketmine\block\RuntimeBlockStateRegistry;
 use pocketmine\block\utils\Fallable;
+use pocketmine\block\VanillaBlocks;
 use pocketmine\entity\object\FallingBlock;
 use pocketmine\event\block\BlockUpdateEvent;
 use pocketmine\event\entity\EntityDespawnEvent;
@@ -68,12 +70,18 @@ class FallingBlockOptimizationComponent implements OptimizationComponent{
 		return $info;
 	}
 
+	private function canBeReplaced(int $state_id) : bool{
+		static $cache = [];
+		return $cache[$state_id] ??= RuntimeBlockStateRegistry::getInstance()->fromStateId($state_id)->canBeReplaced();
+	}
+
 	public function enable(AggressiveOptzApi $api) : void{
 		if(count($this->unregisters) > 0){
 			throw new LogicException("Tried to register event handlers twice");
 		}
 
 		$world_cache_manager = $api->getHelper()->getWorldCacheManager();
+		$registry = RuntimeBlockStateRegistry::getInstance();
 		$this->unregisters = [
 			$api->registerEvent(function(EntitySpawnEvent $event) use($world_cache_manager) : void{
 				$entity = $event->getEntity();
@@ -112,17 +120,6 @@ class FallingBlockOptimizationComponent implements OptimizationComponent{
 				$xc = $x & Chunk::COORD_MASK;
 				$zc = $z & Chunk::COORD_MASK;
 
-				static $not_replaceable = null;
-				if($not_replaceable === null){
-					$not_replaceable = [];
-
-					foreach(RuntimeBlockStateRegistry::getInstance()->getAllKnownStates() as $state){
-						if(!$state->canBeReplaced()){
-							$not_replaceable[$state->getStateId()] = true;
-						}
-					}
-				}
-
 				if($count >= $this->falling_block_queue_size){
 					while($y > 0){
 						if($iterator->moveTo($x, $y, $z) === SubChunkExplorerStatus::INVALID){
@@ -130,7 +127,7 @@ class FallingBlockOptimizationComponent implements OptimizationComponent{
 						}
 
 						assert($iterator->currentSubChunk !== null);
-						if(array_key_exists($iterator->currentSubChunk->getBlockStateId($xc, $y & Chunk::COORD_MASK, $zc), $not_replaceable)){
+						if(!$this->canBeReplaced($iterator->currentSubChunk->getBlockStateId($xc, $y & Chunk::COORD_MASK, $zc))){
 							$entity->teleport(new Vector3($real_pos->x, $y + 1 + ($entity->size->getHeight() / 2), $real_pos->z));
 							$entity->setMotion($motion);
 							break;
@@ -145,7 +142,7 @@ class FallingBlockOptimizationComponent implements OptimizationComponent{
 						}
 
 						assert($iterator->currentSubChunk !== null);
-						if(array_key_exists($iterator->currentSubChunk->getBlockStateId($xc, $y & Chunk::COORD_MASK, $zc), $not_replaceable)){
+						if(!$this->canBeReplaced($iterator->currentSubChunk->getBlockStateId($xc, $y & Chunk::COORD_MASK, $zc))){
 							break;
 						}
 
@@ -191,33 +188,84 @@ class FallingBlockOptimizationComponent implements OptimizationComponent{
 				}
 			}),
 
-			$api->registerEvent(function(BlockUpdateEvent $event) use($world_cache_manager) : void{
+			$api->registerEvent(function(BlockUpdateEvent $event) use($world_cache_manager, $registry) : void{
 				$block = $event->getBlock();
 				if(!($block instanceof Fallable)){
 					return;
 				}
 
 				$pos = $block->getPosition();
+				$world = $pos->getWorld();
+
 				/** @var int $x */
 				$x = $pos->x;
+				/** @var int $y */
+				$y = $pos->y;
 				/** @var int $z */
 				$z = $pos->z;
-				$chunk = $world_cache_manager->get($pos->getWorld())->getChunk($x >> Chunk::COORD_BIT_SIZE, $z >> Chunk::COORD_BIT_SIZE);
+
+				$chunkX = $x >> Chunk::COORD_BIT_SIZE;
+				$chunkZ = $z >> Chunk::COORD_BIT_SIZE;
+				$chunk = $world->getChunk($chunkX, $chunkZ);
 				if($chunk === null){
 					return;
 				}
 
-				$info = $this->getChunkInfo($chunk);
+				$fb_chunk = $world_cache_manager->get($world)->getChunk($chunkX, $chunkZ);
+				if($fb_chunk === null){
+					return;
+				}
 
-				/** @var int $y */
-				$y = $pos->y;
+				$info = $this->getChunkInfo($fb_chunk);
+
+				if($y > World::Y_MIN + 1 && $world->getBlockAt($x, $y - 1, $z) instanceof Air){
+					$block_state_id = $block->getStateId();
+					$explorer = new SubChunkExplorer($world);
+					$cx = $x & Chunk::COORD_MASK;
+					$cz = $z & Chunk::COORD_MASK;
+					$depth = 1;
+					$cursor = $y - 1;
+					$last_block_id = null;
+					while(
+						$explorer->moveTo($x, $cursor, $z) !== SubChunkExplorerStatus::INVALID &&
+						$this->canBeReplaced($last_block_id = $explorer->currentSubChunk->getBlockStateId($cx, $cursor & Chunk::COORD_MASK, $cz))
+					){
+						++$depth;
+						--$cursor;
+					}
+					if($last_block_id === null || !$registry->fromStateId($last_block_id)->hasEntityCollision()){
+						$cursor = $y + 1;
+						$tower_height = 0;
+						while(
+							$explorer->moveTo($x, $cursor, $z) !== SubChunkExplorerStatus::INVALID &&
+							$explorer->currentSubChunk->getBlockStateId($cx, $cursor & Chunk::COORD_MASK, $cz) === $block_state_id)
+						{
+							++$tower_height;
+							++$cursor;
+						}
+						if($tower_height > $depth){
+							for($i = 1; $i < $depth; $i++){
+								$world->setBlockAt($x, $y - $i, $z, $block, false);
+							}
+							$block_air = VanillaBlocks::AIR();
+							for($i = ($tower_height - $depth) + 2; $i <= $tower_height; $i++){
+								$world->setBlockAt($x, $y + $i, $z, $block_air, false);
+							}
+							$event->cancel();
+							$explorer->invalidate();
+							return;
+						}
+					}
+					$explorer->invalidate();
+				}
 
 				if($info->entity_count >= $this->falling_block_max_count){
 					$event->cancel();
 					$info->queued[World::blockHash($x, $y, $z)] = null;
-				}else{
-					unset($info->queued[World::blockHash($x, $y, $z)]);
+					return;
 				}
+
+				unset($info->queued[World::blockHash($x, $y, $z)]);
 			}),
 
 			$world_cache_manager->registerUnloadListener(function(World $world, AggressiveOptzWorldCache $cache) : void{
