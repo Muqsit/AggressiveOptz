@@ -40,6 +40,10 @@ final class Loader extends PluginBase{
 	public function loadComponentsFromConfig(array $config) : void{
 		$component_manager = $this->api->getComponentManager();
 		foreach($config as $identifier => $data){
+			if(!$this->api->getComponentFactory()->exists($identifier)){
+				$this->getLogger()->warning("Component {$identifier} is not registered. This configuration entry will be skipped.");
+				continue;
+			}
 			if($data["enabled"]){
 				$component_manager->enable($identifier, $data["configuration"]);
 			}
