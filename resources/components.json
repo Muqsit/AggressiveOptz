@@ -10,9 +10,5 @@
     "aggressiveoptz:liquid_falling": {
         "enabled": true,
         "configuration": {}
-    },
-    "aggressiveoptz:network_item": {
-        "enabled": true,
-        "configuration": {}
     }
 }
