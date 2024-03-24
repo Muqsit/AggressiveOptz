@@ -1,4 +1,10 @@
 {
+    "aggressiveoptz:break_vertically_supported_block": {
+        "enabled": true,
+        "configuration": {
+            "blocks": ["carpet"]
+        }
+    },
     "aggressiveoptz:falling_block": {
         "enabled": true,
         "configuration": {
